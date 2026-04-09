@@ -1,27 +1,30 @@
 package tasks
 
-data class Item(val name: String, val price: Double, val quantity: Int)
+data class Item(val name: String, val price: Double, val quantity: Int) {
+    val totalPrice: Double get() = price * quantity
+}
 
 class ShoppingCart {
     private val items = mutableListOf<Item>()
-    private var appliedPromo: String? = null
+    private var appliedPromo: PromoCode? = null
+
+    private enum class PromoCode(val multiplier: Double) {
+        SAVE10(0.9),
+        HALFOFF(0.5)
+    }
 
     fun addItem(item: Item) {
-        if (item.price <= 0) throw IllegalArgumentException("Price must be positive")
+        require(item.price > 0) { "ПРайс" }
         items.add(item)
     }
 
     fun applyPromo(code: String) {
-        if (appliedPromo != null) throw IllegalStateException("Promo already applied")
-        appliedPromo = code
+        require(appliedPromo == null) { "ПРОмо коды" }
+        appliedPromo = PromoCode.valueOf(code)
     }
 
     fun total(): Double {
-        var sum = items.sumOf { it.price * it.quantity }
-        when (appliedPromo) {
-            "SAVE10" -> sum *= 0.9
-            "HALFOFF" -> sum *= 0.5
-        }
-        return sum
+        val subtotal = items.sumOf { it.totalPrice }
+        return appliedPromo?.let { subtotal * it.multiplier } ?: subtotal
     }
 }
