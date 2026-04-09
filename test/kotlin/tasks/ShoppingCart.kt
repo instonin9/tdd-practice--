@@ -19,7 +19,7 @@ class ShoppingCart {
     }
 
     fun applyPromo(code: String) {
-        require(appliedPromo == null) { "ПРОмо коды" }
+        require(appliedPromo == null) { "ПРОмо код" }
         appliedPromo = PromoCode.valueOf(code)
     }
 
